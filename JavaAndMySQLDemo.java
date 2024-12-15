@@ -33,18 +33,18 @@ public class JavaAndMySQLDemo {
         //command_delete_data
         var delete = "DeLETE FROM books WHERE id = 101";
         //set connection with myaql
-        var conn = DriverManager.getConnection(dburl, "root", "sjj20051206");
+        var conn = DriverManager.getConnection(dburl, "root", "code of MySQL");
 
         //query table
         queryTable(conn,query);
 
         //insert data into table
-        System.out.println("--插入数据(106,\"面向对象程序设计（java）\",\"程旭\",0,\"武汉大学\")");
+        System.out.println("--插入数据(106,\"面向对象程序设计（java）\",\"name\",0,\"武汉大学\")");
         try(PreparedStatement create=conn.prepareStatement(insert)){
             //指定参数
             create.setInt(1,106);
             create.setString(2,"面向对象程序设计（java）");
-            create.setString(3,"程旭");
+            create.setString(3,"name");
             create.setDouble(4,0);
             create.setString(5,"武汉大学");
             //更新
