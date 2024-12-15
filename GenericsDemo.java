@@ -1,5 +1,3 @@
-import java.util.Objects;
-
 public class GenericsDemo {
 
     public static class Animal {
