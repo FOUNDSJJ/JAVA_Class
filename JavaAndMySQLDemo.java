@@ -72,7 +72,7 @@ public class JavaAndMySQLDemo {
         //conmand_insert_data
         var insert = "INSERT INTO books (id,name,author,price,press) VALUES(?,?,?,?,?)";
         //command_delete_data
-        var delete = "DeLETE FROM books WHERE id = 101";
+        var delete = "DELETE FROM books WHERE id = 101";
         //set connection with myaql
         var conn = DriverManager.getConnection(dburl, "root", "code of MySQL");
 
