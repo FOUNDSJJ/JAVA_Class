@@ -1,9 +1,12 @@
+
+import java.awt.*;
+import java.io.*;
 import java.sql.*;
 
 public class JavaAndMySQLDemo {
 
     //query table with conn and command
-    public static void queryTable(Connection conn, String command){
+    public static void queryTable(Connection conn, String command) {
         System.out.println("--查看表格books");
         try (
                 var stmt = conn.prepareStatement(command);
@@ -19,7 +22,45 @@ public class JavaAndMySQLDemo {
         }
     }
 
-    public static void main(String[] args) throws SQLException {
+    //insert photo by binarystream
+    public static int insertPhoto(Connection conn, String tableName, String path, int id, String name) throws SQLException, IOException {
+        var insertPhoto = "INSERT INTO " + tableName + " VALUES(?,?,?)";
+        var pstmt = conn.prepareStatement(insertPhoto);
+        var fis = new FileInputStream(path);
+        pstmt.setInt(1, id);
+        pstmt.setString(2, name);
+        pstmt.setBinaryStream(3, fis, (int) (fis.available()));
+        return pstmt.executeUpdate();
+    }
+
+    //get photo from table
+    public static void getPhotoById(Connection conn, String tableName, int id, String storePath) {
+        var getPhoto = "SELECT id,name,photo FROM " + tableName + " WHERE id = ?";
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(getPhoto);
+            //将getPhoto中的？设置为id
+            pstmt.setInt(1, id);
+            ResultSet rst = pstmt.executeQuery();
+            if (rst.next()) {
+                //创建存放地址的输出流
+                FileOutputStream fos = new FileOutputStream(new File(storePath));
+                //读取数据库图片存放的二进制流
+                InputStream is = rst.getBinaryStream(3);
+                byte[] buffer = new byte[4 * 1024];
+                int length = 0;
+                while ((length = is.read(buffer)) != -1) {
+                    fos.write(buffer, 0, length);
+                }
+                fos.flush();
+                fos.close();
+                is.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) throws SQLException, IOException {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException cne) {
@@ -65,6 +106,15 @@ public class JavaAndMySQLDemo {
         }
 
         //query table
-        queryTable(conn,query);
+        queryTable(conn, query);
+
+        //insert photo
+        String inputPath = ("C:\\Users\\12198\\Pictures\\武大\\图片1.png");
+        int index = insertPhoto(conn, "students", inputPath, 101, "武汉大学");
+
+        //get photo from table(path must endwith ".bmp")
+        String storePath = "C:\\Users\\12198\\Pictures\\武大\\武汉大学.bmp";
+        getPhotoById(conn, "students", 101, storePath);
+
     }
 }
